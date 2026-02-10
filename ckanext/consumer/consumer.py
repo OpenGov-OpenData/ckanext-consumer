@@ -12,12 +12,14 @@ def get_kafka_config(ckan_config):
     Supports SASL/SSL authentication and client tuning.
     """
     # 1. Base Required Configuration
-    bootstrap_servers = ckan_config.get('ckan.reactor.kafka.bootstrap.servers')
-    group_id = ckan_config.get('ckan.reactor.kafka.group_id')
+    bootstrap_servers = ckan_config.get('ckan.consumer.kafka.bootstrap.servers')
+    group_id = ckan_config.get('ckan.consumer.kafka.group_id')
 
     if not all([bootstrap_servers, group_id]):
         log.error(
-            "Missing required config. Set 'ckan.reactor.kafka.bootstrap.servers' and 'ckan.reactor.kafka.group_id' in ckan.ini")
+            "Missing required config. Set 'ckan.consumer.kafka.bootstrap.servers' and "
+            "'ckan.consumer.kafka.group_id' in ckan.ini"
+        )
         sys.exit(1)
 
     # Initialize config with defaults
@@ -25,26 +27,26 @@ def get_kafka_config(ckan_config):
         'bootstrap.servers': bootstrap_servers,
         'group.id': group_id,
         'enable.auto.commit': True,
-        'auto.offset.reset': ckan_config.get('ckan.reactor.kafka.auto.offset.reset', 'earliest'),
+        'auto.offset.reset': ckan_config.get('ckan.consumer.kafka.auto.offset.reset', 'earliest'),
     }
 
     # 2. Extended Configuration (Security & Tuning)
     # Map CKAN .ini keys to librdkafka properties
     config_mapping = {
         # Identification
-        'ckan.reactor.kafka.client.id': 'client.id',
+        'ckan.consumer.kafka.client.id': 'client.id',
 
         # Security Protocol (PLAINTEXT, SASL_SSL, etc.)
-        'ckan.reactor.kafka.security.protocol': 'security.protocol',
+        'ckan.consumer.kafka.security.protocol': 'security.protocol',
 
         # SASL Auth
-        'ckan.reactor.kafka.sasl.mechanisms': 'sasl.mechanisms',
-        'ckan.reactor.kafka.sasl.username': 'sasl.username',
-        'ckan.reactor.kafka.sasl.password': 'sasl.password',
+        'ckan.consumer.kafka.sasl.mechanisms': 'sasl.mechanisms',
+        'ckan.consumer.kafka.sasl.username': 'sasl.username',
+        'ckan.consumer.kafka.sasl.password': 'sasl.password',
 
         # Connection Tuning
-        'ckan.reactor.kafka.session.timeout.ms': 'session.timeout.ms',
-        'ckan.reactor.kafka.socket.timeout.ms': 'socket.timeout.ms',
+        'ckan.consumer.kafka.session.timeout.ms': 'session.timeout.ms',
+        'ckan.consumer.kafka.socket.timeout.ms': 'socket.timeout.ms',
     }
 
     # 3. Apply optional settings if they exist in .ini
@@ -68,7 +70,7 @@ def process_message(msg, handlers):
 
     if not handler:
         # Avoid log spam if subscribing to patterns, but useful for debugging
-        # log.debug(f"No handler registered for topic '{topic}'. Skipping.")
+        log.debug(f"No handler registered for topic '{topic}'. Skipping.")
         return
 
     try:
@@ -108,7 +110,7 @@ def run_consumer(ckan_config, topic_handlers):
 
     try:
         consumer.subscribe(topics_to_subscribe)
-        log.info(f"⚛️  Reactor Consumer started as client: {conf.get('client.id', 'unknown')}")
+        log.info(f"⚛️ Consumer started as client: {conf.get('client.id', 'unknown')}")
         log.info(f"🎧 Listening on topics: {topics_to_subscribe}")
 
         while True:
@@ -127,6 +129,6 @@ def run_consumer(ckan_config, topic_handlers):
             process_message(msg, topic_handlers)
 
     except KeyboardInterrupt:
-        log.info("Reactor stopped by user.")
+        log.info("Consumer stopped by user.")
     finally:
         consumer.close()

@@ -49,25 +49,25 @@ class DummyConsumer:
         self.closed = True
 
 
-def test_run_consumer_exits_when_no_topics(reactor_consumer_module, monkeypatch, caplog):
-    consumer = reactor_consumer_module
+def test_run_consumer_exits_when_no_topics(consumer_module, monkeypatch, caplog):
+    consumer = consumer_module
 
     # Avoid instantiating the real Consumer.
     monkeypatch.setattr(consumer, "Consumer", DummyConsumer)
 
     consumer.run_consumer(
         {
-            "ckan.reactor.kafka.bootstrap.servers": "localhost:9092",
-            "ckan.reactor.kafka.group_id": "group",
+            "ckan.consumer.kafka.bootstrap.servers": "localhost:9092",
+            "ckan.consumer.kafka.group_id": "group",
         },
         {},
     )
 
-    assert "nothing to listen" in caplog.text
+    assert "No topic handlers registered" in caplog.text
 
 
-def test_run_consumer_subscribes_and_closes(reactor_consumer_module, monkeypatch):
-    consumer = reactor_consumer_module
+def test_run_consumer_subscribes_and_closes(consumer_module, monkeypatch):
+    consumer = consumer_module
 
     monkeypatch.setattr(consumer, "KafkaError", DummyKafkaError)
     monkeypatch.setattr(consumer, "Consumer", DummyConsumer)
@@ -80,8 +80,8 @@ def test_run_consumer_subscribes_and_closes(reactor_consumer_module, monkeypatch
     monkeypatch.setattr(consumer, "process_message", fake_process_message)
 
     ckan_cfg = {
-        "ckan.reactor.kafka.bootstrap.servers": "localhost:9092",
-        "ckan.reactor.kafka.group_id": "group",
+        "ckan.consumer.kafka.bootstrap.servers": "localhost:9092",
+        "ckan.consumer.kafka.group_id": "group",
     }
 
     handlers = {"topic-a": lambda _data: None}

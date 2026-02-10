@@ -22,7 +22,6 @@ class ConsumerPlugin(plugins.SingletonPlugin):
 @click.group()
 def consumer():
     """Commands for the Consumer event system."""
-    pass
 
 
 @consumer.command()

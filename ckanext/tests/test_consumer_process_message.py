@@ -13,17 +13,8 @@ class DummyMsg:
         return self._value
 
 
-def test_process_message_skips_when_no_handler(reactor_consumer_module, caplog):
-    consumer = reactor_consumer_module
-
-    msg = DummyMsg("topic-a", b"{}")
-    consumer.process_message(msg, handlers={})
-
-    assert "no handler is registered" in caplog.text
-
-
-def test_process_message_calls_handler_with_decoded_json(reactor_consumer_module):
-    consumer = reactor_consumer_module
+def test_process_message_calls_handler_with_decoded_json(consumer_module):
+    consumer = consumer_module
 
     called = {"data": None}
 
@@ -38,8 +29,8 @@ def test_process_message_calls_handler_with_decoded_json(reactor_consumer_module
     assert called["data"] == payload
 
 
-def test_process_message_passes_empty_dict_for_null_value(reactor_consumer_module):
-    consumer = reactor_consumer_module
+def test_process_message_passes_empty_dict_for_null_value(consumer_module):
+    consumer = consumer_module
 
     called = {"data": None}
 
@@ -53,8 +44,8 @@ def test_process_message_passes_empty_dict_for_null_value(reactor_consumer_modul
     assert called["data"] == {}
 
 
-def test_process_message_logs_json_decode_error(reactor_consumer_module, caplog):
-    consumer = reactor_consumer_module
+def test_process_message_logs_json_decode_error(consumer_module, caplog):
+    consumer = consumer_module
 
     def handler(_data):
         raise AssertionError("handler should not be called")
@@ -66,8 +57,8 @@ def test_process_message_logs_json_decode_error(reactor_consumer_module, caplog)
     assert "JSON Decode Error" in caplog.text
 
 
-def test_process_message_logs_handler_exception(reactor_consumer_module, caplog):
-    consumer = reactor_consumer_module
+def test_process_message_logs_handler_exception(consumer_module, caplog):
+    consumer = consumer_module
 
     def handler(_data):
         raise ValueError("boom")

@@ -1,19 +1,19 @@
-def test_plugin_get_commands_returns_reactor_group(reactor_plugin_module):
-    plugin_mod = reactor_plugin_module
+def test_plugin_get_commands_returns_consumer_group(consumer_plugin_module):
+    plugin_mod = consumer_plugin_module
 
-    plugin = plugin_mod.ReactorPlugin()
+    plugin = plugin_mod.ConsumerPlugin()
     commands = plugin.get_commands()
 
-    assert commands == [plugin_mod.reactor]
+    assert commands == [plugin_mod.consumer]
 
 
-def test_consume_warns_when_no_handlers(monkeypatch, reactor_plugin_module):
-    plugin_mod = reactor_plugin_module
+def test_consume_warns_when_no_handlers(monkeypatch, consumer_plugin_module):
+    plugin_mod = consumer_plugin_module
 
     echoed = []
     monkeypatch.setattr(plugin_mod.click, "echo", lambda msg: echoed.append(msg))
 
-    # No plugins implementing IReactor.
+    # No plugins implementing IConsumer.
     monkeypatch.setattr(plugin_mod.plugins, "PluginImplementations", lambda _iface: [])
 
     # Avoid blocking consumer loop.
@@ -33,8 +33,8 @@ def test_consume_warns_when_no_handlers(monkeypatch, reactor_plugin_module):
     assert called["handlers"] == {}
 
 
-def test_consume_loads_handlers_and_continues_on_error(monkeypatch, reactor_plugin_module):
-    plugin_mod = reactor_plugin_module
+def test_consume_loads_handlers_and_continues_on_error(monkeypatch, consumer_plugin_module):
+    plugin_mod = consumer_plugin_module
 
     echoed = []
     monkeypatch.setattr(plugin_mod.click, "echo", lambda msg: echoed.append(msg))

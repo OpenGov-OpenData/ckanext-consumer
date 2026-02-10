@@ -21,15 +21,15 @@ def _ensure_extension_on_syspath(extension_root):
 
 
 @pytest.fixture
-def reactor_consumer_module(monkeypatch):
-    """Import `ckanext.reactor.consumer` with confluent_kafka stubbed."""
+def consumer_module(monkeypatch):
+    """Import `ckanext.consumer.consumer` with confluent_kafka stubbed."""
 
     dummy_kafka = types.SimpleNamespace(Consumer=object, KafkaError=DummyKafkaError)
     monkeypatch.setitem(sys.modules, "confluent_kafka", dummy_kafka)
 
     import importlib
 
-    return importlib.import_module("ckanext.reactor.consumer")
+    return importlib.import_module("ckanext.consumer.consumer")
 
 
 @pytest.fixture
@@ -81,8 +81,8 @@ def ckan_stub(monkeypatch):
 
 
 @pytest.fixture
-def reactor_plugin_module(monkeypatch, ckan_stub):
-    """Import `ckanext.reactor.plugin` with CKAN + click + confluent stubbed."""
+def consumer_plugin_module(monkeypatch, ckan_stub):
+    """Import `ckanext.consumer.plugin` with CKAN + click + confluent stubbed."""
 
     # Stub `confluent_kafka` so `consumer.py` import works.
     dummy_kafka = types.SimpleNamespace(Consumer=object, KafkaError=DummyKafkaError)
@@ -110,4 +110,4 @@ def reactor_plugin_module(monkeypatch, ckan_stub):
 
     import importlib
 
-    return importlib.import_module("ckanext.reactor.plugin")
+    return importlib.import_module("ckanext.consumer.plugin")

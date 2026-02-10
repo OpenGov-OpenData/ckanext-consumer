@@ -1,8 +1,8 @@
 import pytest
 
 
-def test_get_kafka_config_requires_bootstrap_and_group_id(reactor_consumer_module, caplog):
-    consumer = reactor_consumer_module
+def test_get_kafka_config_requires_bootstrap_and_group_id(consumer_module, caplog):
+    consumer = consumer_module
 
     with pytest.raises(SystemExit) as excinfo:
         consumer.get_kafka_config({})
@@ -11,12 +11,12 @@ def test_get_kafka_config_requires_bootstrap_and_group_id(reactor_consumer_modul
     assert "Missing required config" in caplog.text
 
 
-def test_get_kafka_config_uses_default_offset_reset(reactor_consumer_module):
-    consumer = reactor_consumer_module
+def test_get_kafka_config_uses_default_offset_reset(consumer_module):
+    consumer = consumer_module
 
     cfg = {
-        "ckan.reactor.kafka.bootstrap.servers": "localhost:9092",
-        "ckan.reactor.kafka.group_id": "group",
+        "ckan.consumer.kafka.bootstrap.servers": "localhost:9092",
+        "ckan.consumer.kafka.group_id": "group",
     }
 
     kafka_cfg = consumer.get_kafka_config(cfg)
@@ -27,13 +27,13 @@ def test_get_kafka_config_uses_default_offset_reset(reactor_consumer_module):
     assert kafka_cfg["enable.auto.commit"] is True
 
 
-def test_get_kafka_config_allows_override_offset_reset(reactor_consumer_module):
-    consumer = reactor_consumer_module
+def test_get_kafka_config_allows_override_offset_reset(consumer_module):
+    consumer = consumer_module
 
     cfg = {
-        "ckan.reactor.kafka.bootstrap.servers": "localhost:9092",
-        "ckan.reactor.kafka.group_id": "group",
-        "ckan.reactor.kafka.auto.offset.reset": "latest",
+        "ckan.consumer.kafka.bootstrap.servers": "localhost:9092",
+        "ckan.consumer.kafka.group_id": "group",
+        "ckan.consumer.kafka.auto.offset.reset": "latest",
     }
 
     kafka_cfg = consumer.get_kafka_config(cfg)
